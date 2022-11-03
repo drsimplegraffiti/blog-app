@@ -33,5 +33,5 @@ app.use('/api/auth', authRoutes);
 
 app.listen(port, () => {
   console.clear();
-  console.log(`app running on port ${port}`);
+  console.log(`app running on port: ${port}`);
 });
