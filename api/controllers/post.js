@@ -90,27 +90,27 @@ export const addPost = async (req, res) => {
 export const updatePost = async (req, res) => {
   try {
     const token = req.cookies.access_token;
-    if (!token) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    const userInfo = jwt.verify(token, process.env.TOKEN_SECRET);
-    if (!userInfo) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
+    if (!token) return res.status(401).json('Not authenticated!');
 
-    const postId = req.params.id;
-    const { title, content, cat } = req.body;
-    const img = req.file.filename;
-    const uid = userInfo.id;
-    const q =
-      'UPDATE `posts` SET `title` = ?, `content` = ?, `img` = ?, `cat` = ?, WHERE `id` = ? AND `uid` = ?';
-    const data = await db.query(q, [title, content, img, cat, postId, uid]);
-    if (!data) {
-      return res
-        .status(403)
-        .json({ message: 'You can update only your posts' });
-    }
-    return res.status(200).json({ message: 'Post updated' });
+    jwt.verify(token, process.env.TOKEN_SECRET, (err, userInfo) => {
+      if (err) return res.status(403).json('Token is not valid!');
+
+      const postId = req.params.id;
+      const q =
+        'UPDATE posts SET `title`=?,`content`=?,`img`=?,`cat`=? WHERE `id` = ? AND `uid` = ?';
+
+      const values = [
+        req.body.title,
+        req.body.content,
+        req.body.img,
+        req.body.cat,
+      ];
+
+      db.query(q, [...values, postId, userInfo.id], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.json('Post has been updated.');
+      });
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({

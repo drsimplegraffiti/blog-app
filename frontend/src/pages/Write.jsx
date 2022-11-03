@@ -1,18 +1,18 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
-import moment from 'moment';
 import { useLocation, useNavigate } from 'react-router-dom';
+import moment from 'moment';
 
 const Write = () => {
   const state = useLocation().state;
-  const navigate = useNavigate();
-
-  const [value, setValue] = useState(state?.value || '');
-  const [title, setTitle] = useState(state?.title || '');
-  const [cat, setCat] = useState(state?.cat || null);
+  const [value, setValue] = useState(state?.title || '');
+  const [title, setTitle] = useState(state?.content || '');
   const [file, setFile] = useState(null);
+  const [cat, setCat] = useState(state?.cat || '');
+
+  const navigate = useNavigate();
 
   const upload = async () => {
     try {
@@ -28,15 +28,16 @@ const Write = () => {
   const handleClick = async (e) => {
     e.preventDefault();
     const imgUrl = await upload();
+
     try {
       state
-        ? await axios.put(`/posts/${state._id}`, {
+        ? await axios.put(`/posts/${state.id}`, {
             title,
             content: value,
             cat,
             img: file ? imgUrl : '',
           })
-        : await axios.post('/posts', {
+        : await axios.post(`/posts/`, {
             title,
             content: value,
             cat,
@@ -54,8 +55,7 @@ const Write = () => {
       <div className="content">
         <input
           type="text"
-          value={title}
-          placeholder="item"
+          placeholder="Title"
           onChange={(e) => setTitle(e.target.value)}
         />
         <div className="editorContainer">
@@ -93,7 +93,6 @@ const Write = () => {
         </div>
         <div className="item">
           <h1>Category</h1>
-
           <div className="cat">
             <input
               type="radio"
@@ -105,7 +104,6 @@ const Write = () => {
             />
             <label htmlFor="art">Art</label>
           </div>
-
           <div className="cat">
             <input
               type="radio"
@@ -117,7 +115,6 @@ const Write = () => {
             />
             <label htmlFor="science">Science</label>
           </div>
-
           <div className="cat">
             <input
               type="radio"
@@ -129,7 +126,6 @@ const Write = () => {
             />
             <label htmlFor="technology">Technology</label>
           </div>
-
           <div className="cat">
             <input
               type="radio"
@@ -141,7 +137,6 @@ const Write = () => {
             />
             <label htmlFor="cinema">Cinema</label>
           </div>
-
           <div className="cat">
             <input
               type="radio"
@@ -153,7 +148,6 @@ const Write = () => {
             />
             <label htmlFor="design">Design</label>
           </div>
-
           <div className="cat">
             <input
               type="radio"
